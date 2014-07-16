@@ -17,7 +17,9 @@ Descriptions of each file:
 Where to put these files inside Cantera:
 
 1) ReactorBase.h and ShocktubeIdealGasPhase.h should be placed inside the "zeroD" include folder directory. Note: the ReactorBase class is still fully compatible with other ReactorTypes. It has simply been modified to include this new Reactortype.
+
 2) ReactorBase.cpp and ShokctubeIdealGasPhase.cpp should be placed inside the src directory under the "zeroD" file.
+
 3) Inside the src directory a folder named "ShocktubeProp" should be created to contain the ShockProp.cpp file.  Lastly, a "ShocktubeProp" folder should be included in the include directory of Cantera to contain the ShockProp.h file .
 
 
