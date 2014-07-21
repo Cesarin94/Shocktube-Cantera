@@ -37,9 +37,7 @@ void ShocktubeIdealGasReactor::getInitialConditions(double t0, size_t leny, doub
         return;
     }
     m_thermo->restoreState(m_state);
-	//ADDED BY ME:
-	m_rho0 = m_thermo->density();
-	//
+	
     // set the first component to the total mass
     m_mass = m_thermo->density() * m_vol;
     y[0] = m_mass;
@@ -77,9 +75,11 @@ void ShocktubeIdealGasReactor::getInitialConditions(double t0, size_t leny, doub
 void ShocktubeIdealGasReactor::initialize(doublereal t0)
 {
     m_thermo->restoreState(m_state);
+	rho0 = m_thermo->density();
     m_sdot.resize(m_nsp, 0.0);
     m_wdot.resize(m_nsp, 0.0);
     m_uk.resize(m_nsp, 0.0);
+	m_hk.resize(m_nsp, 0.0);
     m_nv = m_nsp + 6;
     for (size_t w = 0; w < m_nwalls; w++)
         if (m_wall[w]->surface(m_lr[w])) {
@@ -242,12 +242,18 @@ void ShocktubeIdealGasReactor::evalEqs(doublereal time, doublereal* y,
 
 	//Temperature contribution from non-summation terms:
 	dTdt += pow(m_shock->gasSpeed,2)* dRdt / (m_thermo->density() * m_thermo->cp_mass());
-	
+	// Compute the Lab time derivative
+	dvdt += (-1 / m_thermo->density() ) * dRdt;
+	// INCLUDE THE COMPUTATION FOR THE LAB TIME HERE:
+	// Note that the Actual Formula is :
+	// dt/dt = (rho0 * Area0) / (rho * Area)
+	// But here the area is constant.
+	dtdt += (rho0)/m_thermo->density();
+
     for (size_t n = 0; n < m_nsp; n++) {
         // heat release from gas phase and surface reactions
         // mcvdTdt -= m_wdot[n] * m_uk[n] * m_vol;
         // mcvdTdt -= m_sdot[n] * m_uk[n];
-		dvdt += (-1 / m_thermo->density() ) * dRdt;
 		dTdt -= m_wdot[n] * m_hk[n] / ( m_thermo->density() * m_thermo->cp_mass() ) ;
         // dilution by net surface mass flux
         dYdt[n] -= Y[n] * mdot_surf / m_mass;
@@ -272,11 +278,6 @@ void ShocktubeIdealGasReactor::evalEqs(doublereal time, doublereal* y,
                 // flow of species into system and dilution by other species
                 dYdt[n] += (mdot_spec - mdot_in * Y[n]) / m_mass;
 
-				// INCLUDE THE COMPUTATION FOR THE LAB TIME HERE:
-				// Note that the Actual Formula is :
-				// dt/dt = (rho0 * Area0) / (rho * Area)
-				// But here the area is constant.
-				dtdt += (m_rho0)/m_thermo->density();
 
                 // In combintion with h_in*mdot_in, flow work plus thermal
                 // energy carried with the species

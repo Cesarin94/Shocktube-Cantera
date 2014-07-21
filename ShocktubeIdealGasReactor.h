@@ -48,6 +48,7 @@ public:
 protected:
     vector_fp m_uk; //!< Species molar internal energies
 	vector_fp m_hk; //!< Species molar enthalpies
+	double rho0; //!<  Initial density pointer 
 };
 
 }

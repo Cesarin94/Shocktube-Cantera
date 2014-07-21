@@ -12,9 +12,9 @@ class ShockProp
 {
 	double gasSpeed,labTime,Area;
 public:
-	void initializeShockProp();
-	void setShockProp();
-	int* getCurrentShockProp();
+	void initializeValues(double area);
+	void setValues(double speed, double time);
+	double* getCurrentValues();
 
 };
 

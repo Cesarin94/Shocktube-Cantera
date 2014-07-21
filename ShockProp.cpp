@@ -23,11 +23,12 @@ labTime = time;
 gasSpeed = speed;
 }
 
-int* ShockProp::getCurrentValues()
+double* ShockProp::getCurrentValues()
 {
-	static double r[2];
+	static double r[3];
 	r[0]=labTime;
 	r[1]=gasSpeed;
+	r[2]=Area;
 	return r;
 }
 
